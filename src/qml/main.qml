@@ -39,34 +39,57 @@ ApplicationWindow {
         width: parent.width
         TabButton {
             id: outputTabButton
-            text: qsTr("Record test")
+            text: qsTr("General View")
         }
         TabButton {
             id: outputTabButton1
-            text: qsTr("Run test")
+            text: qsTr("Record test")
         }
         TabButton {
             id: outputTabButton2
+            text: qsTr("Run test")
+        }
+        TabButton {
+            id: outputTabButton3
             text: qsTr("Inspect")
         }
     }
 
-    StackLayout {
-           anchors.fill: parent
-           currentIndex: bar.currentIndex
-           RecorderTab{}
+    SplitView
+    {
+        anchors.fill: parent
+        orientation: Qt.Vertical
+        Layout.preferredHeight: (parent.height/4)*3
 
-           Rectangle {
-               id: "out2"
-               color: 'plum'
-               implicitWidth: 300
-               implicitHeight: 200
+        StackLayout {
+               //SplitView.fillHeight: true
+               SplitView.fillWidth: true
+               SplitView.minimumHeight: (parent.height/6)*1
+               SplitView.maximumHeight: parent.height
+               SplitView.preferredHeight: (parent.height/6)*5
+               currentIndex: bar.currentIndex
+               RecorderTab{}
+
+               Rectangle {
+                   color: 'lightblue'
+                   implicitWidth: 300
+                   implicitHeight: 200
+               }
+               Rectangle {
+                   color: 'lightgoldenrodyellow'
+                   implicitWidth: 300
+                   implicitHeight: 200
+               }
+               Rectangle {
+                   color: 'lightgreen'
+                   implicitWidth: 300
+                   implicitHeight: 200
+               }
            }
-           Rectangle {
-               id: "out3"
-               color: 'lightblue'
-               implicitWidth: 300
-               implicitHeight: 200
-           }
-       }
+        FooterOutput {
+            SplitView.minimumHeight: (parent.height/6)*1
+            SplitView.maximumHeight: (parent.height/6)*3
+            SplitView.preferredHeight: (parent.height/6)*1
+        }
+    }
 }
