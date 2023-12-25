@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 Rectangle {
-    property string logOutput: "<p><b>GUIRecorder</b> version 1.0.0 </p> <p>Author Piotr Zielinski</p>"
+    property string logOutput: "<p><b>GUIRecorder</b> version 1.0.0</p>"
     color: 'white'
     Layout.fillHeight: true
     Layout.fillWidth: true

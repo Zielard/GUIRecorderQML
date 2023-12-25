@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+#include <windows.h>   // WinApi header
 template<typename R, typename A>
 class DLLloader
 {

@@ -4,7 +4,7 @@
 #include <QFile>
 
 #include "../include/StepsModelsController.h"
-//#include "TreeModel/customtype.h"
+#include "../include/InitExtendLibs.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,11 +13,13 @@ int main(int argc, char *argv[])
     file.open(QIODevice::ReadOnly);
     StepsModelsController model(file.readAll());
     file.close();
-
+    InitExtendLibs initlibs;
     QApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("theModel", &model);
+    engine.rootContext()->setContextProperty("initExtenalObj", &initlibs);
+
     const QUrl url(QStringLiteral("qrc:/src/qml/main.qml"));
     engine.load(url);
 

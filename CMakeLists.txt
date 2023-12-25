@@ -15,6 +15,7 @@ qt6_standard_project_setup()
 
 qt6_add_executable(GUIRecorder
     src/source/main.cpp
+    src/source/InitExtendLibs.cpp
 
     src/include/StepsModelsController.h
     src/include/StepInfo.h
@@ -22,16 +23,13 @@ qt6_add_executable(GUIRecorder
     src/source/TreeModel/StepsModelsController.cpp
     src/source/TreeModel/StepInfo.cpp
 
-
     #External
     src/include/DllLoader.h
     src/include/InitExtendLibs.h
 
 
     src/externalLibs/API/IGUIRecorderCore.h
-    src/externalLibs/API/IGUIRecorderCore.cpp
     src/externalLibs/API/IGUIRecorderReportGen.h
-    src/externalLibs/API/IGUIRecorderReportGen.cpp
     src/externalLibs/API/IParentInfo.h
     src/externalLibs/API/IPlayer.h
     src/externalLibs/API/IRecorder.h
@@ -49,6 +47,9 @@ qt6_add_resources(GUIRecorder "configuration"
         src/qml/content/RecorderTab/TreeViewStepsList/TreeViewStepsList.qml
         src/qml/content/RecorderTab/TreeViewStepsList/TreeDelegate.qml
         src/source/TreeModel/default.txt
+
+        #Logger
+        src/js/qmlfooterlog.js
 )
 
 TARGET_LINK_LIBRARIES(GUIRecorder PRIVATE

@@ -3,6 +3,7 @@ import QtQuick.Window
 import QtQuick.Layouts
 import QtQuick.Controls
 import "./content/RecorderTab"
+import "../js/qmlfooterlog.js" as Logger
 
 ApplicationWindow {
     title: "GUIRecorder"
@@ -11,7 +12,6 @@ ApplicationWindow {
     minimumWidth: 400
     minimumHeight: 400
     visible: true
-//src/qml/content/RecorderTab/RecorderTab.qml
     menuBar: MenuBar {
             Menu {
                 title: qsTr("&File")
@@ -87,9 +87,36 @@ ApplicationWindow {
                }
            }
         FooterOutput {
+            id: footerOutputId
             SplitView.minimumHeight: (parent.height/6)*1
             SplitView.maximumHeight: (parent.height/6)*3
             SplitView.preferredHeight: (parent.height/6)*1
+        }
+    }
+
+    //js code
+    function log(logType, str)
+    {
+        footerOutputId.logOutput += Logger.create(logType, str);
+    }
+    Component.onCompleted:
+    {
+        if(initExtenalObj.loadReportLib())
+        {
+            log(Logger.Succ ,"Correctly loaded <b>GUIRecorderReportGen</b>");
+        }
+        else
+        {
+            log(Logger.Err ,"Not loaded <b>GUIRecorderReportGen</b>");
+        }
+
+        if(initExtenalObj.loadRecorderCoreLib())
+        {
+            log(Logger.Succ ,"Correctly loaded <b>GUIRecorderCore</b>");
+        }
+        else
+        {
+            log(Logger.Err ,"Not loaded <b>GUIRecorderCore</b>");
         }
     }
 }

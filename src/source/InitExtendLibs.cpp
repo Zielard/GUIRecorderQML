@@ -12,14 +12,14 @@ InitExtendLibs::~InitExtendLibs()
 
 }
 
-void InitExtendLibs::loadReportLib()
+bool InitExtendLibs::loadReportLib()
 {
 	reportGenLib = new DLLloader<IGUIRecorderReportGen*, void>("GUIRecorderReportGen.dll");
-	loadedGen = reportGenLib->LoadDLL("CreateIGUIRecorderReportGenInstance");
+    return reportGenLib->LoadDLL("CreateIGUIRecorderReportGenInstance");
 }
 
-void InitExtendLibs::loadRecorderCoreLib()
+bool InitExtendLibs::loadRecorderCoreLib()
 {
     recorderCoreLib = new DLLloader<IGUIRecorderCore*, void>("GUIRecorderCore.dll");
-	loadedRep = recorderCoreLib->LoadDLL("CreateIGUIRecorderCoreInstance");
+    return recorderCoreLib->LoadDLL("CreateIGUIRecorderCoreInstance");
 }
