@@ -4,6 +4,9 @@
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 class StepInfo;
 
@@ -37,6 +40,8 @@ public:
 private:
     QVariant newCustomType(const QString &text, int position);
     void setupModelData(const QStringList &lines, StepInfo *parent);
+    void setupModelData(const QString &jsonContent, StepInfo *parent);
+    void recusiveCreateObject(const QJsonValue & scenarioValue, QList<StepInfo*>& parents, QList<int>& indentations, int number);
 
     StepInfo *rootItem;
     QHash<int, QByteArray> m_roleNameMapping;

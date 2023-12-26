@@ -42,6 +42,7 @@ qt6_add_resources(GUIRecorder "configuration"
     FILES
         src/qtquickcontrols2.conf
         src/qml/main.qml
+        src/qml/MainMenuBar.qml
         src/qml/FooterOutput.qml
         src/qml/content/RecorderTab/RecorderTab.qml
         src/qml/content/RecorderTab/TreeViewStepsList/TreeViewStepsList.qml

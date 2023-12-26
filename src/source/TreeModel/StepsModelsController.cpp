@@ -51,6 +51,7 @@
 //#include "customtype.h"
 
 #include <QStringList>
+#include <QDebug>
 
 //! [0]
 StepsModelsController::StepsModelsController(const QString &data, QObject *parent)
@@ -62,7 +63,7 @@ StepsModelsController::StepsModelsController(const QString &data, QObject *paren
     QList<QVariant> rootData;
     rootData << "Title" << "Summary";
     rootItem = new StepInfo(rootData);
-    setupModelData(data.split(QString("\n")), rootItem);
+    setupModelData(data, rootItem);
 }
 //! [0]
 
@@ -186,6 +187,138 @@ QVariant StepsModelsController::newCustomType(const QString &text, int position)
     QVariant v;
     v.setValue(text);
     return v;
+}
+
+void StepsModelsController::recusiveCreateObject(const QJsonValue & scenarioValue, QList<StepInfo*>& parents, QList<int>& indentations, int number)
+{
+        QJsonObject scenarioObject = scenarioValue.toObject();
+        // Konwersja obiektu na łańcuch znaków
+
+        QString itemContent = "";
+        if (scenarioObject.contains("AutomationId")) {
+            QString automationId = scenarioObject["AutomationId"].toString();
+            itemContent += "AutomationId:" + automationId + "\n";
+        }
+        if (scenarioObject.contains("ClassName")) {
+            QString className = scenarioObject["ClassName"].toString();
+            itemContent += "ClassName:" + className + "\n";
+        }
+        if (scenarioObject.contains("EventType")) {
+            QString eventType = scenarioObject["EventType"].toString();
+            itemContent += "EventType:" + eventType + "\n";
+        }
+        if (scenarioObject.contains("FrameworkId")) {
+            QString frameworkId = scenarioObject["FrameworkId"].toString();
+            itemContent += "FrameworkId:" + frameworkId + "\n";
+        }
+        if (scenarioObject.contains("ItemType")) {
+            QString itemType = scenarioObject["ItemType"].toString();
+            itemContent += "ItemType:" + itemType + "\n";
+        }
+        if (scenarioObject.contains("KeyData")) {
+            QString keyData = scenarioObject["KeyData"].toString();
+            itemContent += "KeyData:" + keyData + "\n";
+        }
+        if (scenarioObject.contains("Parent")) {
+            bool hasChild = false;
+            //QString parent = scenarioObject["Parent"].toString();
+            if(scenarioObject["Parent"].isObject())
+            {
+                QJsonObject parent =  scenarioObject["Parent"].toObject();
+                if(parent.count())
+                {
+                    hasChild = true;
+                    ++number;
+                }
+                else
+                {
+                    --number;
+                }
+
+                if (number > indentations.last()) {
+                    // The last child of the current parent is now the new parent
+                    // unless the current parent has no children.
+
+                    if (parents.last()->childCount() > 0) {
+                        parents << parents.last()->child(parents.last()->childCount()-1);
+                        indentations << number;
+                    }
+                } else {
+                    while( (number < indentations.last()) && (parents.count() > 0)) {
+                        parents.pop_back();
+                        indentations.pop_back();
+                    }
+                }
+
+                // Append a new item to the current parent's list of children.
+                QList<QVariant> columnData;
+                columnData << QVariant(QString::number(number));
+                columnData << newCustomType(itemContent, 0);
+                parents.last()->appendChild(new StepInfo(columnData, parents.last()));
+                //parents.last()->appendChild(columnData , parents.last());
+                if(hasChild)
+                {
+                    recusiveCreateObject(scenarioObject["Parent"], parents, indentations, number);
+                }
+            }
+        }
+}
+
+void StepsModelsController::setupModelData(const QString &jsonContent, StepInfo *parent)
+{
+    QList<StepInfo*> parents;
+    QList<int> indentations;
+    parents << parent;
+    indentations << 0;
+
+    int number = 0;
+    // Wczytywanie JSON
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonContent.toUtf8());
+
+    // Sprawdź, czy wczytywanie się powiodło
+    if (!jsonDocument.isNull()) {
+        // Przetwarzanie JSON
+        if (jsonDocument.isObject()) {
+            QJsonObject jsonObject = jsonDocument.object();
+
+            // Przetwarzanie obiektu JSON
+            if (jsonObject.contains("Scenario") && jsonObject["Scenario"].isArray()) {
+                QJsonArray scenarioArray = jsonObject["Scenario"].toArray();
+
+                int step = 0;
+                for (const QJsonValue& scenarioValue : scenarioArray) {
+                    if (scenarioValue.isObject()) {
+                        //indentations.push_back(1);
+                        parents.last()->appendChild(new StepInfo({ "Step : " + QString::number(step),  "Step : " + QString::number(step)}, parents.last()));
+                        number++;
+                        indentations << number;
+                        recusiveCreateObject(scenarioValue, parents, indentations, number);
+                        if (number > indentations.last()) {
+                            // The last child of the current parent is now the new parent
+                            // unless the current parent has no children.
+
+                            if (parents.last()->childCount() > 0) {
+                                parents << parents.last()->child(parents.last()->childCount()-1);
+                                indentations << number;
+                            }
+                        } else {
+                            while( (number < indentations.last()) && (parents.count() > 0)) {
+                                parents.pop_back();
+                                indentations.pop_back();
+                            }
+                        }
+                        number--;
+                        step++;
+                    }
+            }
+        } else {
+            qDebug() << "Nieprawidłowy format JSON (nie jest obiektem).";
+        }
+    } else {
+        qDebug() << "Błąd podczas wczytywania JSON.";
+    }
+
+}
 }
 
 void StepsModelsController::setupModelData(const QStringList &lines, StepInfo *parent)

@@ -9,7 +9,8 @@
 int main(int argc, char *argv[])
 {
 
-    QFile file(":/src/source/TreeModel/default.txt");
+    //QFile file(":/src/source/TreeModel/default.txt");
+    QFile file("C:/projects/GUIRecorderConsole/GUID_CONSOLE/example/Calculator_win10_multipy_pl/Scenario.json");
     file.open(QIODevice::ReadOnly);
     StepsModelsController model(file.readAll());
     file.close();
