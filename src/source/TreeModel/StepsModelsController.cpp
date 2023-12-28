@@ -52,18 +52,17 @@
 
 #include <QStringList>
 #include <QDebug>
-
+#include <QFile>
 //! [0]
-StepsModelsController::StepsModelsController(const QString &data, QObject *parent)
+StepsModelsController::StepsModelsController(const QString &path, QObject *parent)
     : QAbstractItemModel(parent)
 {
-    m_roleNameMapping[StepsModelsControllerRoleName] = "title";
-    m_roleNameMapping[StepsModelsControllerRoleDescription] = "summary";
-
-    QList<QVariant> rootData;
-    rootData << "Title" << "Summary";
-    rootItem = new StepInfo(rootData);
-    setupModelData(data, rootItem);
+    m_roleNameMapping[StepsModelsControllerRoleName] = "content";
+    m_roleNameMapping[StepsModelsControllerImagePath] = "imgReference";
+    if(!path.isEmpty())
+    {
+        loadScenarioTreeView(path);
+    }
 }
 //! [0]
 
@@ -72,11 +71,39 @@ StepsModelsController::~StepsModelsController()
 {
     delete rootItem;
 }
+
+void StepsModelsController::loadScenarioTreeView(QString path)
+{
+    beginResetModel();
+    path.replace("file:///","");
+
+    QString changedPath = path;
+    changedPath.append("/Scenario.json");
+    pathToCurrentProject = path;
+
+    QFile file(changedPath);
+    file.open(QIODevice::ReadOnly);
+
+    if(rootItem != nullptr)
+    {
+        delete rootItem;
+    }
+    QList<QVariant> rootData;
+    rootData << "content";
+    rootItem = new StepInfo(rootData);
+    setupModelData(file.readAll(), rootItem);
+    file.close();
+    endResetModel();
+    emit treeModelChanged();
+}
 //! [1]
 
 //! [2]
 int StepsModelsController::columnCount(const QModelIndex &parent) const
 {
+    if(rootItem == nullptr)
+        return 0;
+
     if (parent.isValid())
         return static_cast<StepInfo*>(parent.internalPointer())->columnCount();
     else
@@ -87,10 +114,12 @@ int StepsModelsController::columnCount(const QModelIndex &parent) const
 //! [3]
 QVariant StepsModelsController::data(const QModelIndex &index, int role) const
 {
+    if(rootItem == nullptr)
+        return QVariant();
     if (!index.isValid())
         return QVariant();
 
-    if (role != StepsModelsControllerRoleName && role != StepsModelsControllerRoleDescription)
+    if ( (role != StepsModelsControllerRoleName) && (role != StepsModelsControllerImagePath))
         return QVariant();
 
     StepInfo *item = static_cast<StepInfo*>(index.internalPointer());
@@ -164,7 +193,8 @@ int StepsModelsController::rowCount(const QModelIndex &parent) const
     StepInfo *parentItem;
     if (parent.column() > 0)
         return 0;
-
+    if(rootItem == nullptr)
+        return 0;
     if (!parent.isValid())
         parentItem = rootItem;
     else
@@ -252,10 +282,10 @@ void StepsModelsController::recusiveCreateObject(const QJsonValue & scenarioValu
 
                 // Append a new item to the current parent's list of children.
                 QList<QVariant> columnData;
-                columnData << QVariant(QString::number(number));
+
                 columnData << newCustomType(itemContent, 0);
+                columnData << QVariant("");
                 parents.last()->appendChild(new StepInfo(columnData, parents.last()));
-                //parents.last()->appendChild(columnData , parents.last());
                 if(hasChild)
                 {
                     recusiveCreateObject(scenarioObject["Parent"], parents, indentations, number);
@@ -270,7 +300,7 @@ void StepsModelsController::setupModelData(const QString &jsonContent, StepInfo 
     QList<int> indentations;
     parents << parent;
     indentations << 0;
-
+    //qDebug() << jsonContent;
     int number = 0;
     // Wczytywanie JSON
     QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonContent.toUtf8());
@@ -285,11 +315,11 @@ void StepsModelsController::setupModelData(const QString &jsonContent, StepInfo 
             if (jsonObject.contains("Scenario") && jsonObject["Scenario"].isArray()) {
                 QJsonArray scenarioArray = jsonObject["Scenario"].toArray();
 
-                int step = 0;
+                int step = 1;
                 for (const QJsonValue& scenarioValue : scenarioArray) {
                     if (scenarioValue.isObject()) {
                         //indentations.push_back(1);
-                        parents.last()->appendChild(new StepInfo({ "Step : " + QString::number(step),  "Step : " + QString::number(step)}, parents.last()));
+                        parents.last()->appendChild(new StepInfo({ "Step : " + QString::number(step), pathToCurrentProject + "/Img/" + QString::number(step)+".jpg" }, parents.last()));
                         number++;
                         indentations << number;
                         recusiveCreateObject(scenarioValue, parents, indentations, number);
@@ -319,6 +349,7 @@ void StepsModelsController::setupModelData(const QString &jsonContent, StepInfo 
     }
 
 }
+    qDebug() << "End setupModelData";
 }
 
 void StepsModelsController::setupModelData(const QStringList &lines, StepInfo *parent)

@@ -1,13 +1,22 @@
 import QtQuick
 import QtQuick.Controls
-
+import QtQuick.Dialogs
 MenuBar 
 {
+    FolderDialog {
+        id: fileDialog
+        //currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+        onAccepted:   theModel.loadScenarioTreeView(Qt.resolvedUrl(selectedFolder));
+        //selectedNameFilter.index: 1
+        //nameFilters: ["Json files (*.json)"]
+    }
+
     Menu {
-        title: qsTr("&File OFF")
+        title: qsTr("&File")
         Action { text: qsTr("&New... OFF") }
         Action { text: qsTr("&Open...") 
-                 onTriggered: window.activeFocusItem.copy()}
+                 onTriggered: fileDialog.open()
+                 }
         Action { text: qsTr("&Save OFF") }
         Action { text: qsTr("Save &As... OFF") }
         MenuSeparator { }

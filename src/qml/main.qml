@@ -6,6 +6,14 @@ import "./content/RecorderTab"
 import "../js/qmlfooterlog.js" as Logger
 
 ApplicationWindow {
+
+    Connections {
+        target: theModel
+        function onTreeModelChanged() {
+            log(Logger.Info ,"Steps model has been updated");
+        }
+    }
+
     title: "GUIRecorder"
     width: 640
     height: 480
@@ -23,11 +31,11 @@ ApplicationWindow {
         }
         TabButton {
             id: outputTabButton1
-            text: qsTr("Record test")
+            text: qsTr("Editing the test")
         }
         TabButton {
             id: outputTabButton2
-            text: qsTr("Run test")
+            text: qsTr("Editing a template")
         }
         TabButton {
             id: outputTabButton3
