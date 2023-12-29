@@ -6,7 +6,10 @@ MenuBar
     FolderDialog {
         id: fileDialog
         //currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
-        onAccepted:   theModel.loadScenarioTreeView(Qt.resolvedUrl(selectedFolder));
+        onAccepted:   {
+            theModel.loadScenarioTreeView(Qt.resolvedUrl(selectedFolder));
+            templateModel.loadTemplateFile(Qt.resolvedUrl(selectedFolder));
+        }
         //selectedNameFilter.index: 1
         //nameFilters: ["Json files (*.json)"]
     }

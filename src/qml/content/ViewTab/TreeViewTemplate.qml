@@ -14,7 +14,7 @@ ScrollView {
         Layout.fillHeight: true
         Layout.preferredWidth: parent.width/5
 
-        model: theModel
+        model: templateModel
         delegate: Item {
             id: treeDelegate
 
@@ -70,12 +70,6 @@ ScrollView {
                     text: "▸"
                     rotation: treeDelegate.expanded ? 90 : 0
                 }
-//                Component.onCompleted:
-//                {
-//                    console.log(content)
-//                    console.log(imgReference)
-//                    //console.log(dataDescription)
-//                }
                 Text {
                     id: label
                     x: padding + (treeDelegate.isTreeNode ? (treeDelegate.depth + 1) * treeDelegate.indent : 0)

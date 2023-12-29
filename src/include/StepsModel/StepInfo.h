@@ -1,5 +1,5 @@
-#ifndef AUDIOINFO_H
-#define AUDIOINFO_H
+#ifndef STEPINFO_H
+#define STEPINFO_H
 
 #include <QObject>
 #include <QUrl>
@@ -34,4 +34,4 @@ private:
     
 };
 
-#endif // AUDIOINFO_H
+#endif // STEPINFO_H

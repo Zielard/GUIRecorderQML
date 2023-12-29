@@ -61,7 +61,7 @@ TemplatesController::TemplatesController(const QString &path, QObject *parent)
     m_roleNameMapping[TemplatesControllerImagePath] = "imgReference";
     if(!path.isEmpty())
     {
-        loadScenarioTreeView(path);
+        loadTemplateFile(path);
     }
 }
 //! [0]
@@ -72,13 +72,13 @@ TemplatesController::~TemplatesController()
     delete rootItem;
 }
 
-void TemplatesController::loadScenarioTreeView(QString path)
+void TemplatesController::loadTemplateFile(QString path)
 {
     beginResetModel();
     path.replace("file:///","");
 
     QString changedPath = path;
-    changedPath.append("/Scenario.json");
+    changedPath.append("/Template.json");
     pathToCurrentProject = path;
 
     QFile file(changedPath);
@@ -225,11 +225,11 @@ void TemplatesController::recusiveCreateObject(const QJsonValue & scenarioValue,
         // Konwersja obiektu na łańcuch znaków
 
         QString itemContent = "";
-        if (scenarioObject.contains("AutomationId")) {
+        if (scenarioObject.contains("Enviroment variables")) {
             QString automationId = scenarioObject["AutomationId"].toString();
             itemContent += "AutomationId:" + automationId + "\n";
         }
-        if (scenarioObject.contains("ClassName")) {
+        if (scenarioObject.contains("Prepare scenario")) {
             QString className = scenarioObject["ClassName"].toString();
             itemContent += "ClassName:" + className + "\n";
         }
@@ -312,35 +312,53 @@ void TemplatesController::setupModelData(const QString &jsonContent, TemplateInf
             QJsonObject jsonObject = jsonDocument.object();
 
             // Przetwarzanie obiektu JSON
-            if (jsonObject.contains("Scenario") && jsonObject["Scenario"].isArray()) {
-                QJsonArray scenarioArray = jsonObject["Scenario"].toArray();
+            if (jsonObject.contains("Prepare") && jsonObject["Prepare"].isObject()) {
+                QJsonObject prepareObject = jsonObject["Prepare"].toObject();
 
-                int step = 1;
-                for (const QJsonValue& scenarioValue : scenarioArray) {
-                    if (scenarioValue.isObject()) {
-                        //indentations.push_back(1);
-                        parents.last()->appendChild(new TemplateInfo({ "Step : " + QString::number(step), pathToCurrentProject + "/Img/" + QString::number(step)+".jpg" }, parents.last()));
-                        number++;
-                        indentations << number;
-                        recusiveCreateObject(scenarioValue, parents, indentations, number);
-                        if (number > indentations.last()) {
-                            // The last child of the current parent is now the new parent
-                            // unless the current parent has no children.
+                QString itemContent = "";
+                if (prepareObject.contains("Enviroment variables")) {
+                    QString envVar = prepareObject["Enviroment variables"].toString();
+                    itemContent += "envVar:" + envVar + "\n";
+                }
+                if (prepareObject.contains("Scripts")) {
+                    QString scripts = prepareObject["Scripts"].toString();
+                    itemContent += "Scripts:" + scripts + "\n";
+                }
+                if (prepareObject.contains("Prepare scenario")) {
+                    QString preSce = prepareObject["Prepare scenario"].toString();
+                    itemContent += "Prepare scenario:" + preSce + "\n";
+                }
 
-                            if (parents.last()->childCount() > 0) {
-                                parents << parents.last()->child(parents.last()->childCount()-1);
-                                indentations << number;
-                            }
-                        } else {
-                            while( (number < indentations.last()) && (parents.count() > 0)) {
-                                parents.pop_back();
-                                indentations.pop_back();
-                            }
-                        }
-                        number--;
-                        step++;
-                    }
+                // Append a new item to the current parent's list of children.
+                QList<QVariant> columnData;
+
+                columnData << newCustomType(itemContent, 0);
+                columnData << QVariant("");
+                parents.last()->appendChild(new TemplateInfo(columnData, parents.last()));
             }
+            if (jsonObject.contains("Clear") && jsonObject["Clear"].isObject()) {
+                QJsonObject clearObject = jsonObject["Clear"].toObject();
+
+                QString itemContent = "";
+                if (clearObject.contains("Enviroment variables")) {
+                    QString envVar = clearObject["Enviroment variables"].toString();
+                    itemContent += "envVar:" + envVar + "\n";
+                }
+                if (clearObject.contains("Scripts")) {
+                    QString scripts = clearObject["Scripts"].toString();
+                    itemContent += "Scripts:" + scripts + "\n";
+                }
+                if (clearObject.contains("Clear scenario")) {
+                    QString clearSce = clearObject["Clear scenario"].toString();
+                    itemContent += "Clear scenario:" + clearSce + "\n";
+                }
+
+                // Append a new item to the current parent's list of children.
+                QList<QVariant> columnData;
+
+                columnData << newCustomType(itemContent, 0);
+                columnData << QVariant("");
+                parents.last()->appendChild(new TemplateInfo(columnData, parents.last()));
         } else {
             qDebug() << "Nieprawidłowy format JSON (nie jest obiektem).";
         }

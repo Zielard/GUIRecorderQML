@@ -1,5 +1,5 @@
-#ifndef TemplatesControllerROLES_H
-#define TemplatesControllerROLES_H
+#ifndef TEMPLATESCONTOLLERROLES_H
+#define TEMPLATESCONTOLLERROLES_H
 
 #include <QAbstractItemModel>
 #include <QModelIndex>
@@ -36,7 +36,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
     QHash<int, QByteArray> roleNames() const override;
-    Q_INVOKABLE void loadScenarioTreeView(QString path);
+    Q_INVOKABLE void loadTemplateFile(QString path);
 signals:
     void treeModelChanged();
 private:
@@ -49,4 +49,4 @@ private:
     TemplateInfo *rootItem = nullptr;
     QHash<int, QByteArray> m_roleNameMapping;
 };
-#endif // TemplatesControllerROLES_H
+#endif // TEMPLATESCONTOLLERROLES_H

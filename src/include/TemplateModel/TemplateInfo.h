@@ -1,5 +1,5 @@
-#ifndef AUDIOINFO_H
-#define AUDIOINFO_H
+#ifndef TEMPLATEINFO_H
+#define TEMPLATEINFO_H
 
 #include <QObject>
 #include <QUrl>
@@ -34,4 +34,4 @@ private:
     
 };
 
-#endif // AUDIOINFO_H
+#endif // TEMPLATEINFO_H
