@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Layouts
 import QtQuick.Controls
-import "./content/RecorderTab"
+import "./content/ViewTab"
 import "../js/qmlfooterlog.js" as Logger
 
 ApplicationWindow {
@@ -27,15 +27,11 @@ ApplicationWindow {
         width: parent.width
         TabButton {
             id: outputTabButton
-            text: qsTr("General View")
+            text: qsTr("Project View")
         }
         TabButton {
             id: outputTabButton1
-            text: qsTr("Editing the test")
-        }
-        TabButton {
-            id: outputTabButton2
-            text: qsTr("Editing a template")
+            text: qsTr("Result View")
         }
         TabButton {
             id: outputTabButton3
@@ -56,7 +52,7 @@ ApplicationWindow {
                SplitView.maximumHeight: parent.height
                SplitView.preferredHeight: (parent.height/6)*5
                currentIndex: bar.currentIndex
-               RecorderTab{}
+               ViewTab{}
 
                Rectangle {
                    color: 'lightblue'

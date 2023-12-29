@@ -17,11 +17,17 @@ qt6_add_executable(GUIRecorder
     src/source/main.cpp
     src/source/InitExtendLibs.cpp
 
-    src/include/StepsModelsController.h
-    src/include/StepInfo.h
+    src/include/StepsModel/StepsModelsController.h
+    src/include/StepsModel/StepInfo.h
 
-    src/source/TreeModel/StepsModelsController.cpp
-    src/source/TreeModel/StepInfo.cpp
+    src/source/StepsModel/StepsModelsController.cpp
+    src/source/StepsModel/StepInfo.cpp
+
+    src/include/TemplateModel/TemplatesModelsController.h
+    src/include/TemplateModel/TemplateInfo.h
+
+    src/source/TemplateModel/TemplatesModelsController.cpp
+    src/source/TemplateModel/TemplateInfo.cpp
 
     #External
     src/include/DllLoader.h
@@ -44,10 +50,11 @@ qt6_add_resources(GUIRecorder "configuration"
         src/qml/main.qml
         src/qml/MainMenuBar.qml
         src/qml/FooterOutput.qml
-        src/qml/content/RecorderTab/RecorderTab.qml
-        src/qml/content/RecorderTab/TreeViewStepsList/TreeViewStepsList.qml
-        src/qml/content/RecorderTab/TreeViewStepsList/TreeDelegate.qml
-        src/source/TreeModel/default.txt
+        src/qml/content/ViewTab/ViewTab.qml
+        src/qml/content/ViewTab/TreeViewTemplate.qml
+        src/qml/content/ViewTab/TreeViewStepsList/TreeViewStepsList.qml
+        src/qml/content/ViewTab/TreeViewStepsList/TreeDelegate.qml
+        src/source/TemplateModel/default.txt
 
         #Logger
         src/js/qmlfooterlog.js

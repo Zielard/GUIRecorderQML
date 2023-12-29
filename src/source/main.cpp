@@ -3,7 +3,7 @@
 #include <QQmlContext>
 #include <QFile>
 
-#include "../include/StepsModelsController.h"
+#include "../include/StepsModel/StepsModelsController.h"
 #include "../include/InitExtendLibs.h"
 
 int main(int argc, char *argv[])

@@ -39,17 +39,17 @@
 ****************************************************************************/
 
 /*
-    StepInfo.cpp
+    TemplateInfo.cpp
 
     A container for items of data supplied by the simple tree model.
 */
 
 #include <QStringList>
 
-#include "../../include/StepInfo.h"
+#include "../../include/TemplateModel/TemplateInfo.h"
 
 //! [0]
-StepInfo::StepInfo(const QList<QVariant> &data, StepInfo *parent)
+TemplateInfo::TemplateInfo(const QList<QVariant> &data, TemplateInfo *parent)
 {
     m_parentItem = parent;
     m_itemData = data;
@@ -57,64 +57,64 @@ StepInfo::StepInfo(const QList<QVariant> &data, StepInfo *parent)
 //! [0]
 
 //! [1]
-StepInfo::~StepInfo()
+TemplateInfo::~TemplateInfo()
 {
     qDeleteAll(m_childItems);
 }
 //! [1]
 
 //! [2]
-void StepInfo::appendChild(StepInfo *item)
+void TemplateInfo::appendChild(TemplateInfo *item)
 {
     m_childItems.append(item);
 }
 //! [2]
 
 //! [3]
-StepInfo *StepInfo::child(int row)
+TemplateInfo *TemplateInfo::child(int row)
 {
     return m_childItems.value(row);
 }
 //! [3]
 
 //! [4]
-int StepInfo::childCount() const
+int TemplateInfo::childCount() const
 {
     return m_childItems.count();
 }
 //! [4]
 
 //! [5]
-int StepInfo::columnCount() const
+int TemplateInfo::columnCount() const
 {
     return m_itemData.count();
 }
 //! [5]
 
 //! [6]
-QVariant StepInfo::data(int column) const
+QVariant TemplateInfo::data(int column) const
 {
     return m_itemData.value(column);
 }
 
-QString StepInfo::dataStr() const
+QString TemplateInfo::dataStr() const
 {
     return data(0).toString();
 }
 //! [6]
 
 //! [7]
-StepInfo *StepInfo::parentItem()
+TemplateInfo *TemplateInfo::parentItem()
 {
     return m_parentItem;
 }
 //! [7]
 
 //! [8]
-int StepInfo::row() const
+int TemplateInfo::row() const
 {
     if (m_parentItem)
-        return m_parentItem->m_childItems.indexOf(const_cast<StepInfo*>(this));
+        return m_parentItem->m_childItems.indexOf(const_cast<TemplateInfo*>(this));
 
     return 0;
 }

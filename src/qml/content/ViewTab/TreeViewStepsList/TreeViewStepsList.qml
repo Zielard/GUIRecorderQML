@@ -4,7 +4,7 @@ import QtQuick.Controls
 
 ScrollView {
     id: view
-    anchors.fill: parent
+    //anchors.fill: parent
     ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
     ScrollBar.vertical.policy: ScrollBar.AlwaysOn
 
@@ -40,6 +40,7 @@ ScrollView {
                     //console.log(tapCount)
                     if(imgReference)
                     {
+                        refTextStep.text = " Active "+ label.text
                         refImage.source = Qt.resolvedUrl("file:///"+ imgReference);
                     }
                     if (tapCount%2 === 0)
@@ -58,7 +59,7 @@ ScrollView {
                 color: 'lightgreen'
                 radius: 25
                 width: padding + label.x + label.implicitWidth + padding
-                x: padding + (treeDelegate.isTreeNode ? (treeDelegate.depth + 1) * treeDelegate.indent : 0)
+                x:  padding + (treeDelegate.depth * treeDelegate.indent)
 
                 height: label.implicitHeight
                 Text {

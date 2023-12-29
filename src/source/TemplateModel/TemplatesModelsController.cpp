@@ -39,14 +39,14 @@
 ****************************************************************************/
 
 /*
-    StepsModelsController.cpp
+    TemplatesController.cpp
 
     Provides a simple tree model to show how to create and use hierarchical
     models.
 */
 
-#include "../../include/StepInfo.h"
-#include "../../include/StepsModelsController.h"
+#include "../../include/TemplateModel/TemplateInfo.h"
+#include "../../include/TemplateModel/TemplatesModelsController.h"
 
 //#include "customtype.h"
 
@@ -54,11 +54,11 @@
 #include <QDebug>
 #include <QFile>
 //! [0]
-StepsModelsController::StepsModelsController(const QString &path, QObject *parent)
+TemplatesController::TemplatesController(const QString &path, QObject *parent)
     : QAbstractItemModel(parent)
 {
-    m_roleNameMapping[StepsModelsControllerRoleName] = "content";
-    m_roleNameMapping[StepsModelsControllerImagePath] = "imgReference";
+    m_roleNameMapping[TemplatesControllerRoleName] = "content";
+    m_roleNameMapping[TemplatesControllerImagePath] = "imgReference";
     if(!path.isEmpty())
     {
         loadScenarioTreeView(path);
@@ -67,12 +67,12 @@ StepsModelsController::StepsModelsController(const QString &path, QObject *paren
 //! [0]
 
 //! [1]
-StepsModelsController::~StepsModelsController()
+TemplatesController::~TemplatesController()
 {
     delete rootItem;
 }
 
-void StepsModelsController::loadScenarioTreeView(QString path)
+void TemplatesController::loadScenarioTreeView(QString path)
 {
     beginResetModel();
     path.replace("file:///","");
@@ -90,7 +90,7 @@ void StepsModelsController::loadScenarioTreeView(QString path)
     }
     QList<QVariant> rootData;
     rootData << "content";
-    rootItem = new StepInfo(rootData);
+    rootItem = new TemplateInfo(rootData);
     setupModelData(file.readAll(), rootItem);
     file.close();
     endResetModel();
@@ -99,37 +99,37 @@ void StepsModelsController::loadScenarioTreeView(QString path)
 //! [1]
 
 //! [2]
-int StepsModelsController::columnCount(const QModelIndex &parent) const
+int TemplatesController::columnCount(const QModelIndex &parent) const
 {
     if(rootItem == nullptr)
         return 0;
 
     if (parent.isValid())
-        return static_cast<StepInfo*>(parent.internalPointer())->columnCount();
+        return static_cast<TemplateInfo*>(parent.internalPointer())->columnCount();
     else
         return rootItem->columnCount();
 }
 //! [2]
 
 //! [3]
-QVariant StepsModelsController::data(const QModelIndex &index, int role) const
+QVariant TemplatesController::data(const QModelIndex &index, int role) const
 {
     if(rootItem == nullptr)
         return QVariant();
     if (!index.isValid())
         return QVariant();
 
-    if ( (role != StepsModelsControllerRoleName) && (role != StepsModelsControllerImagePath))
+    if ( (role != TemplatesControllerRoleName) && (role != TemplatesControllerImagePath))
         return QVariant();
 
-    StepInfo *item = static_cast<StepInfo*>(index.internalPointer());
+    TemplateInfo *item = static_cast<TemplateInfo*>(index.internalPointer());
 
     return item->data(role - Qt::UserRole - 1);
 }
 //! [3]
 
 //! [4]
-Qt::ItemFlags StepsModelsController::flags(const QModelIndex &index) const
+Qt::ItemFlags TemplatesController::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
         return Qt::NoItemFlags;
@@ -139,7 +139,7 @@ Qt::ItemFlags StepsModelsController::flags(const QModelIndex &index) const
 //! [4]
 
 //! [5]
-QVariant StepsModelsController::headerData(int section, Qt::Orientation orientation,
+QVariant TemplatesController::headerData(int section, Qt::Orientation orientation,
                                int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
@@ -150,20 +150,20 @@ QVariant StepsModelsController::headerData(int section, Qt::Orientation orientat
 //! [5]
 
 //! [6]
-QModelIndex StepsModelsController::index(int row, int column, const QModelIndex &parent)
+QModelIndex TemplatesController::index(int row, int column, const QModelIndex &parent)
             const
 {
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    StepInfo *parentItem;
+    TemplateInfo *parentItem;
 
     if (!parent.isValid())
         parentItem = rootItem;
     else
-        parentItem = static_cast<StepInfo*>(parent.internalPointer());
+        parentItem = static_cast<TemplateInfo*>(parent.internalPointer());
 
-    StepInfo *childItem = parentItem->child(row);
+    TemplateInfo *childItem = parentItem->child(row);
     if (childItem)
         return createIndex(row, column, childItem);
     else
@@ -172,13 +172,13 @@ QModelIndex StepsModelsController::index(int row, int column, const QModelIndex 
 //! [6]
 
 //! [7]
-QModelIndex StepsModelsController::parent(const QModelIndex &index) const
+QModelIndex TemplatesController::parent(const QModelIndex &index) const
 {
     if (!index.isValid())
         return QModelIndex();
 
-    StepInfo *childItem = static_cast<StepInfo*>(index.internalPointer());
-    StepInfo *parentItem = childItem->parentItem();
+    TemplateInfo *childItem = static_cast<TemplateInfo*>(index.internalPointer());
+    TemplateInfo *parentItem = childItem->parentItem();
 
     if (parentItem == rootItem)
         return QModelIndex();
@@ -188,9 +188,9 @@ QModelIndex StepsModelsController::parent(const QModelIndex &index) const
 //! [7]
 
 //! [8]
-int StepsModelsController::rowCount(const QModelIndex &parent) const
+int TemplatesController::rowCount(const QModelIndex &parent) const
 {
-    StepInfo *parentItem;
+    TemplateInfo *parentItem;
     if (parent.column() > 0)
         return 0;
     if(rootItem == nullptr)
@@ -198,18 +198,18 @@ int StepsModelsController::rowCount(const QModelIndex &parent) const
     if (!parent.isValid())
         parentItem = rootItem;
     else
-        parentItem = static_cast<StepInfo*>(parent.internalPointer());
+        parentItem = static_cast<TemplateInfo*>(parent.internalPointer());
 
     return parentItem->childCount();
 }
 //! [8]
 
-QHash<int, QByteArray> StepsModelsController::roleNames() const
+QHash<int, QByteArray> TemplatesController::roleNames() const
 {
     return m_roleNameMapping;
 }
 
-QVariant StepsModelsController::newCustomType(const QString &text, int position)
+QVariant TemplatesController::newCustomType(const QString &text, int position)
 {
     // CustomType *t = new CustomType(this);
     // t->setText(text);
@@ -219,7 +219,7 @@ QVariant StepsModelsController::newCustomType(const QString &text, int position)
     return v;
 }
 
-void StepsModelsController::recusiveCreateObject(const QJsonValue & scenarioValue, QList<StepInfo*>& parents, QList<int>& indentations, int number)
+void TemplatesController::recusiveCreateObject(const QJsonValue & scenarioValue, QList<TemplateInfo*>& parents, QList<int>& indentations, int number)
 {
         QJsonObject scenarioObject = scenarioValue.toObject();
         // Konwersja obiektu na łańcuch znaków
@@ -285,7 +285,7 @@ void StepsModelsController::recusiveCreateObject(const QJsonValue & scenarioValu
 
                 columnData << newCustomType(itemContent, 0);
                 columnData << QVariant("");
-                parents.last()->appendChild(new StepInfo(columnData, parents.last()));
+                parents.last()->appendChild(new TemplateInfo(columnData, parents.last()));
                 if(hasChild)
                 {
                     recusiveCreateObject(scenarioObject["Parent"], parents, indentations, number);
@@ -294,9 +294,9 @@ void StepsModelsController::recusiveCreateObject(const QJsonValue & scenarioValu
         }
 }
 
-void StepsModelsController::setupModelData(const QString &jsonContent, StepInfo *parent)
+void TemplatesController::setupModelData(const QString &jsonContent, TemplateInfo *parent)
 {
-    QList<StepInfo*> parents;
+    QList<TemplateInfo*> parents;
     QList<int> indentations;
     parents << parent;
     indentations << 0;
@@ -319,7 +319,7 @@ void StepsModelsController::setupModelData(const QString &jsonContent, StepInfo 
                 for (const QJsonValue& scenarioValue : scenarioArray) {
                     if (scenarioValue.isObject()) {
                         //indentations.push_back(1);
-                        parents.last()->appendChild(new StepInfo({ "Step : " + QString::number(step), pathToCurrentProject + "/Img/" + QString::number(step)+".jpg" }, parents.last()));
+                        parents.last()->appendChild(new TemplateInfo({ "Step : " + QString::number(step), pathToCurrentProject + "/Img/" + QString::number(step)+".jpg" }, parents.last()));
                         number++;
                         indentations << number;
                         recusiveCreateObject(scenarioValue, parents, indentations, number);
@@ -352,9 +352,9 @@ void StepsModelsController::setupModelData(const QString &jsonContent, StepInfo 
     qDebug() << "End setupModelData";
 }
 
-void StepsModelsController::setupModelData(const QStringList &lines, StepInfo *parent)
+void TemplatesController::setupModelData(const QStringList &lines, TemplateInfo *parent)
 {
-    QList<StepInfo*> parents;
+    QList<TemplateInfo*> parents;
     QList<int> indentations;
     parents << parent;
     indentations << 0;
@@ -394,7 +394,7 @@ void StepsModelsController::setupModelData(const QStringList &lines, StepInfo *p
             }
 
             // Append a new item to the current parent's list of children.
-            parents.last()->appendChild(new StepInfo(columnData, parents.last()));
+            parents.last()->appendChild(new TemplateInfo(columnData, parents.last()));
         }
 
         ++number;

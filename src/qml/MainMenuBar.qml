@@ -30,6 +30,11 @@ MenuBar
         Action { text: qsTr("&Paste OFF") }
     }
     Menu {
+        title: qsTr("&Tools")
+        Action { text: qsTr("&Generating HTML report OFF") }
+        Action { text: qsTr("&Run test OFF") }
+    }
+    Menu {
         title: qsTr("&Help OFF")
         Action { text: qsTr("&About OFF") }
     }
