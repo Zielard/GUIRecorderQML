@@ -14,6 +14,26 @@ MenuBar
         //nameFilters: ["Json files (*.json)"]
     }
 
+    Dialog {
+        id: testRunDialog
+        title: "run test"
+        modal: true
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        onAccepted: console.log("Ok clicked")
+        onRejected: console.log("Cancel clicked")
+    }
+
+    Dialog {
+        id: reportGeneratorDialog
+        title: "Report generator"
+        modal: true
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        onAccepted: console.log("Ok clicked")
+        onRejected: console.log("Cancel clicked")
+    }
+
     Menu {
         title: qsTr("&File")
         Action { text: qsTr("&New... OFF") }
@@ -34,8 +54,12 @@ MenuBar
     }
     Menu {
         title: qsTr("&Tools")
-        Action { text: qsTr("&Generating HTML report OFF") }
-        Action { text: qsTr("&Run test OFF") }
+        Action { text: qsTr("&Generating HTML report")
+                 onTriggered: reportGeneratorDialog.open()
+                }
+        Action { text: qsTr("&Run test OFF")
+            onTriggered: testRunDialog.open()
+           }
     }
     Menu {
         title: qsTr("&Help OFF")

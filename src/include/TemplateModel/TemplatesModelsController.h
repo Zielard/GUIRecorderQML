@@ -43,7 +43,8 @@ private:
     QVariant newCustomType(const QString &text, int position);
     void setupModelData(const QStringList &lines, TemplateInfo *parent);
     void setupModelData(const QString &jsonContent, TemplateInfo *parent);
-    void recusiveCreateObject(const QJsonValue & scenarioValue, QList<TemplateInfo*>& parents, QList<int>& indentations, int number);
+    void createPrepareSubTreeView(const QJsonValue & jsonObject, QList<TemplateInfo*>& parents, QList<int>& indentations, int number);
+    void createClearSubTreeView(const QJsonValue & scenarioValue, QList<TemplateInfo*>& parents, QList<int>& indentations, int number);
 
     QString pathToCurrentProject = "";
     TemplateInfo *rootItem = nullptr;

@@ -219,86 +219,80 @@ QVariant TemplatesController::newCustomType(const QString &text, int position)
     return v;
 }
 
-void TemplatesController::recusiveCreateObject(const QJsonValue & scenarioValue, QList<TemplateInfo*>& parents, QList<int>& indentations, int number)
+void TemplatesController::createPrepareSubTreeView(const QJsonValue & jsonObject, QList<TemplateInfo*>& parents, QList<int>& indentations, int number)
 {
-        QJsonObject scenarioObject = scenarioValue.toObject();
-        // Konwersja obiektu na łańcuch znaków
+    QJsonObject prepareObject = jsonObject.toObject();
 
-        QString itemContent = "";
-        if (scenarioObject.contains("Enviroment variables")) {
-            QString automationId = scenarioObject["AutomationId"].toString();
-            itemContent += "AutomationId:" + automationId + "\n";
-        }
-        if (scenarioObject.contains("Prepare scenario")) {
-            QString className = scenarioObject["ClassName"].toString();
-            itemContent += "ClassName:" + className + "\n";
-        }
-        if (scenarioObject.contains("EventType")) {
-            QString eventType = scenarioObject["EventType"].toString();
-            itemContent += "EventType:" + eventType + "\n";
-        }
-        if (scenarioObject.contains("FrameworkId")) {
-            QString frameworkId = scenarioObject["FrameworkId"].toString();
-            itemContent += "FrameworkId:" + frameworkId + "\n";
-        }
-        if (scenarioObject.contains("ItemType")) {
-            QString itemType = scenarioObject["ItemType"].toString();
-            itemContent += "ItemType:" + itemType + "\n";
-        }
-        if (scenarioObject.contains("KeyData")) {
-            QString keyData = scenarioObject["KeyData"].toString();
-            itemContent += "KeyData:" + keyData + "\n";
-        }
-        if (scenarioObject.contains("Parent")) {
-            bool hasChild = false;
-            //QString parent = scenarioObject["Parent"].toString();
-            if(scenarioObject["Parent"].isObject())
-            {
-                QJsonObject parent =  scenarioObject["Parent"].toObject();
-                if(parent.count())
-                {
-                    hasChild = true;
-                    ++number;
-                }
-                else
-                {
-                    --number;
-                }
+    QString itemContent = "";
+    if (prepareObject.contains("Enviroment variables")) {
+        QString envVar = prepareObject["Enviroment variables"].toString();
+        itemContent += "envVar:" + envVar + "\n";
+    }
+    if (prepareObject.contains("Scripts")) {
+        QString scripts = prepareObject["Scripts"].toString();
+        itemContent += "Scripts:" + scripts + "\n";
+    }
+    if (prepareObject.contains("Prepare scenario")) {
+        QString preSce = prepareObject["Prepare scenario"].toString();
+        itemContent += "Prepare scenario:" + preSce + "\n";
+    }
 
-                if (number > indentations.last()) {
-                    // The last child of the current parent is now the new parent
-                    // unless the current parent has no children.
+    // Append a new item to the current parent's list of children.
+    QList<QVariant> columnData;
 
-                    if (parents.last()->childCount() > 0) {
-                        parents << parents.last()->child(parents.last()->childCount()-1);
-                        indentations << number;
-                    }
-                } else {
-                    while( (number < indentations.last()) && (parents.count() > 0)) {
-                        parents.pop_back();
-                        indentations.pop_back();
-                    }
-                }
+    columnData << newCustomType(itemContent, 0);
+    columnData << QVariant("");
+    parents.last()->appendChild(new TemplateInfo(columnData, parents.last()));
+}
 
-                // Append a new item to the current parent's list of children.
-                QList<QVariant> columnData;
+void TemplatesController::createClearSubTreeView(const QJsonValue & jsonObject, QList<TemplateInfo*>& parents, QList<int>& indentations, int number)
+{
+    QJsonObject clearObject = jsonObject.toObject();
 
-                columnData << newCustomType(itemContent, 0);
-                columnData << QVariant("");
-                parents.last()->appendChild(new TemplateInfo(columnData, parents.last()));
-                if(hasChild)
-                {
-                    recusiveCreateObject(scenarioObject["Parent"], parents, indentations, number);
-                }
-            }
+    QString itemContent = "";
+    if (clearObject.contains("Enviroment variables")) {
+        QString envVar = clearObject["Enviroment variables"].toString();
+        itemContent += "envVar:" + envVar + "\n";
+    }
+    if (clearObject.contains("Scripts")) {
+        QString scripts = clearObject["Scripts"].toString();
+        itemContent += "Scripts:" + scripts + "\n";
+    }
+    if (clearObject.contains("Clear scenario")) {
+        QString clearSce = clearObject["Clear scenario"].toString();
+        itemContent += "Clear scenario:" + clearSce + "\n";
+    }
+    number++;
+    if (number > indentations.last()) {
+        // The last child of the current parent is now the new parent
+        // unless the current parent has no children.
+
+        if (parents.last()->childCount() > 0) {
+            parents << parents.last()->child(parents.last()->childCount()-1);
+            indentations << number;
         }
+    } else {
+        while( (number < indentations.last()) && (parents.count() > 0)) {
+            parents.pop_back();
+            indentations.pop_back();
+        }
+    }
+
+    // Append a new item to the current parent's list of children.
+    QList<QVariant> columnData;
+
+    columnData << newCustomType(itemContent, 0);
+    columnData << QVariant("");
+    parents.last()->appendChild(new TemplateInfo(columnData, parents.last()));
+
 }
 
 void TemplatesController::setupModelData(const QString &jsonContent, TemplateInfo *parent)
 {
     QList<TemplateInfo*> parents;
     QList<int> indentations;
-    parents << parent;
+    auto root = parent;
+    parents << root;
     indentations << 0;
     //qDebug() << jsonContent;
     int number = 0;
@@ -311,55 +305,68 @@ void TemplatesController::setupModelData(const QString &jsonContent, TemplateInf
         if (jsonDocument.isObject()) {
             QJsonObject jsonObject = jsonDocument.object();
 
-            // Przetwarzanie obiektu JSON
-            if (jsonObject.contains("Prepare") && jsonObject["Prepare"].isObject()) {
-                QJsonObject prepareObject = jsonObject["Prepare"].toObject();
+        // Przetwarzanie obiektu JSON
+        if (jsonObject.contains("Prepare") && jsonObject["Prepare"].isObject()) {
+            parents.last()->appendChild(new TemplateInfo({ "Prepare : " }, parents.last()));
+            ++number;
+            //indentations << number;
+            if (number > indentations.last()) {
+                // The last child of the current parent is now the new parent
+                // unless the current parent has no children.
 
-                QString itemContent = "";
-                if (prepareObject.contains("Enviroment variables")) {
-                    QString envVar = prepareObject["Enviroment variables"].toString();
-                    itemContent += "envVar:" + envVar + "\n";
+                if (parents.last()->childCount() > 0) {
+                    parents << parents.last()->child(parents.last()->childCount()-1);
+                    indentations << number;
                 }
-                if (prepareObject.contains("Scripts")) {
-                    QString scripts = prepareObject["Scripts"].toString();
-                    itemContent += "Scripts:" + scripts + "\n";
+            } else {
+                while( (number < indentations.last()) && (parents.count() > 0)) {
+                    parents.pop_back();
+                    indentations.pop_back();
                 }
-                if (prepareObject.contains("Prepare scenario")) {
-                    QString preSce = prepareObject["Prepare scenario"].toString();
-                    itemContent += "Prepare scenario:" + preSce + "\n";
-                }
-
-                // Append a new item to the current parent's list of children.
-                QList<QVariant> columnData;
-
-                columnData << newCustomType(itemContent, 0);
-                columnData << QVariant("");
-                parents.last()->appendChild(new TemplateInfo(columnData, parents.last()));
             }
-            if (jsonObject.contains("Clear") && jsonObject["Clear"].isObject()) {
-                QJsonObject clearObject = jsonObject["Clear"].toObject();
+            //parents << parent;
+            createPrepareSubTreeView(jsonObject["Prepare"], parents, indentations, number);
+            if (number > indentations.last()) {
+                // The last child of the current parent is now the new parent
+                // unless the current parent has no children.
 
-                QString itemContent = "";
-                if (clearObject.contains("Enviroment variables")) {
-                    QString envVar = clearObject["Enviroment variables"].toString();
-                    itemContent += "envVar:" + envVar + "\n";
+                if (parents.last()->childCount() > 0) {
+                    parents << parents.last()->child(parents.last()->childCount()-1);
+                    indentations << number;
                 }
-                if (clearObject.contains("Scripts")) {
-                    QString scripts = clearObject["Scripts"].toString();
-                    itemContent += "Scripts:" + scripts + "\n";
+            } else {
+                while( (number < indentations.last()) && (parents.count() > 0)) {
+                    parents.pop_back();
+                    indentations.pop_back();
                 }
-                if (clearObject.contains("Clear scenario")) {
-                    QString clearSce = clearObject["Clear scenario"].toString();
-                    itemContent += "Clear scenario:" + clearSce + "\n";
-                }
+            }
+            parents << root;
+        }
+        if (jsonObject.contains("Clear") && jsonObject["Clear"].isObject()) {
+            parents.last()->appendChild(new TemplateInfo({ "Clear : " }, parents.last()));
+            ++number;
+            //parents << parent;
+            //indentations << number;
+            createClearSubTreeView(jsonObject["Clear"], parents, indentations, number);
+            if (number > indentations.last()) {
+                // The last child of the current parent is now the new parent
+                // unless the current parent has no children.
 
-                // Append a new item to the current parent's list of children.
-                QList<QVariant> columnData;
-
-                columnData << newCustomType(itemContent, 0);
-                columnData << QVariant("");
-                parents.last()->appendChild(new TemplateInfo(columnData, parents.last()));
-        } else {
+                if (parents.last()->childCount() > 0) {
+                    parents << parents.last()->child(parents.last()->childCount()-1);
+                    indentations << number;
+                }
+            } else {
+                while( (number < indentations.last()) && (parents.count() > 0)) {
+                    parents.pop_back();
+                    indentations.pop_back();
+                }
+            }
+            number--;
+            parent = root;
+        }
+        else
+        {
             qDebug() << "Nieprawidłowy format JSON (nie jest obiektem).";
         }
     } else {
